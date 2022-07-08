@@ -4,27 +4,32 @@ class Buttons extends StatelessWidget {
   final color;
   final textColor;
   final String buttonText;
+  final onPressed;
 
-  Buttons({this.color, this.textColor, required this.buttonText});
+  Buttons(
+      {this.color, this.textColor, required this.buttonText, this.onPressed});
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(20),
-        child: Container(
-          color: isOperator(buttonText)
-              ? Color(0xff4B5EFC)
-              : isFirstRow(buttonText)
-                  ? Color(0xffD2D3DA)
-                  : color,
-          child: Center(
-            child: Text(
-              buttonText,
-              style: TextStyle(
-                fontSize: 20,
-                color: isOperator(buttonText) ? Colors.white : textColor,
+    return GestureDetector(
+      onTap: onPressed,
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(20),
+          child: Container(
+            color: isOperator(buttonText)
+                ? Color(0xff4B5EFC)
+                : isFirstRow(buttonText)
+                    ? Color(0xffD2D3DA)
+                    : color,
+            child: Center(
+              child: Text(
+                buttonText,
+                style: TextStyle(
+                  fontSize: 24,
+                  color: isOperator(buttonText) ? Colors.white : textColor,
+                ),
               ),
             ),
           ),

@@ -49,13 +49,38 @@ class _HomePageState extends State<HomePage> {
     '=',
   ];
 
+  var userInput = '';
+  var result = '';
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Color(0xffF1F2F3),
       body: Column(children: [
         Expanded(
-          child: Container(),
+          child: Container(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(12.0),
+                  alignment: Alignment.centerRight,
+                  child: Text(
+                    userInput,
+                    style: TextStyle(fontSize: 40),
+                  ),
+                ),
+                Container(
+                  padding: const EdgeInsets.all(12.0),
+                  alignment: Alignment.centerRight,
+                  child: Text(
+                    result,
+                    style: TextStyle(fontSize: 96),
+                  ),
+                ),
+              ],
+            ),
+          ),
         ),
         Expanded(
           flex: 2,
@@ -70,6 +95,35 @@ class _HomePageState extends State<HomePage> {
                     color: Colors.white,
                     textColor: Color(0xff000000),
                     buttonText: buttons[index],
+                    onPressed: () {
+                      setState(
+                        () {
+                          if (buttons[index] == 'C') {
+                            userInput = '';
+                            result = '';
+                          } else if (buttons[index] == 'DEL') {
+                            if (userInput.isNotEmpty) {
+                              userInput =
+                                  userInput.substring(0, userInput.length - 1);
+                            }
+                          } else if (buttons[index] == '=') {
+                            result = calculate(userInput);
+                          } else if (buttons[index] == '/') {
+                            userInput += '/';
+                          } else if (buttons[index] == 'X') {
+                            userInput += '*';
+                          } else if (buttons[index] == '-') {
+                            userInput += '-';
+                          } else if (buttons[index] == '+') {
+                            userInput += '+';
+                          } else if (buttons[index] == '%') {
+                            userInput += '%';
+                          } else {
+                            userInput += buttons[index];
+                          }
+                        },
+                      );
+                    },
                   );
                 },
               ),
@@ -78,5 +132,10 @@ class _HomePageState extends State<HomePage> {
         )
       ]),
     );
+  }
+
+  String calculate(String userInput) {
+    result = userInput;
+    return result;
   }
 }
