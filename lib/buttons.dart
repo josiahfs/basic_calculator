@@ -39,7 +39,7 @@ class Buttons extends StatelessWidget {
   }
 
   bool isOperator(String x) {
-    if (x == '+' || x == '-' || x == 'X' || x == '/' || x == '=') {
+    if (x == '+' || x == '-' || x == '\u00d7' || x == '\u00f7' || x == '=') {
       return true;
     } else {
       return false;
@@ -47,7 +47,7 @@ class Buttons extends StatelessWidget {
   }
 
   bool isFirstRow(String x) {
-    if (x == 'C' || x == 'DEL' || x == '%') {
+    if (x == 'C' || x == '\u00b1' || x == '%') {
       return true;
     } else {
       return false;

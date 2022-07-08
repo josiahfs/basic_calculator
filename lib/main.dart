@@ -1,5 +1,7 @@
 import 'package:basic_calculator/buttons.dart';
 import 'package:flutter/material.dart';
+import 'package:math_expressions/math_expressions.dart';
+import 'package:auto_size_text/auto_size_text.dart';
 
 void main() {
   runApp(const MyApp());
@@ -28,13 +30,13 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   final List<String> buttons = [
     'C',
-    'DEL',
+    '\u00b1',
     '%',
-    '/',
+    '\u00f7',
     '7',
     '8',
     '9',
-    'X',
+    '\u00d7',
     '4',
     '5',
     '6',
@@ -43,9 +45,9 @@ class _HomePageState extends State<HomePage> {
     '2',
     '3',
     '+',
-    ' ',
-    '0',
     '.',
+    '0',
+    'DEL',
     '=',
   ];
 
@@ -56,14 +58,16 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Color(0xffF1F2F3),
-      body: Column(children: [
-        Expanded(
+      body: Column(mainAxisAlignment: MainAxisAlignment.end, children: [
+        Container(
+          height: MediaQuery.of(context).size.height / 3,
           child: Container(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
                 Container(
-                  padding: const EdgeInsets.all(12.0),
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 12.0, vertical: 3.0),
                   alignment: Alignment.centerRight,
                   child: Text(
                     userInput,
@@ -71,62 +75,70 @@ class _HomePageState extends State<HomePage> {
                   ),
                 ),
                 Container(
-                  padding: const EdgeInsets.all(12.0),
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 12.0, vertical: 3.0),
                   alignment: Alignment.centerRight,
-                  child: Text(
+                  child: AutoSizeText(
                     result,
                     style: TextStyle(fontSize: 96),
+                    minFontSize: 40,
+                    maxLines: 1,
                   ),
                 ),
               ],
             ),
           ),
         ),
-        Expanded(
-          flex: 2,
+        Container(
+          height: MediaQuery.of(context).size.height / 3.3 * 2,
           child: Container(
-            child: Center(
-              child: GridView.builder(
-                itemCount: buttons.length,
-                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 4),
-                itemBuilder: (context, index) {
-                  return Buttons(
-                    color: Colors.white,
-                    textColor: Color(0xff000000),
-                    buttonText: buttons[index],
-                    onPressed: () {
-                      setState(
-                        () {
-                          if (buttons[index] == 'C') {
-                            userInput = '';
-                            result = '';
-                          } else if (buttons[index] == 'DEL') {
-                            if (userInput.isNotEmpty) {
-                              userInput =
-                                  userInput.substring(0, userInput.length - 1);
-                            }
-                          } else if (buttons[index] == '=') {
-                            result = calculate(userInput);
-                          } else if (buttons[index] == '/') {
-                            userInput += '/';
-                          } else if (buttons[index] == 'X') {
-                            userInput += '*';
-                          } else if (buttons[index] == '-') {
-                            userInput += '-';
-                          } else if (buttons[index] == '+') {
-                            userInput += '+';
-                          } else if (buttons[index] == '%') {
-                            userInput += '%';
-                          } else {
-                            userInput += buttons[index];
+            child: GridView.builder(
+              padding: EdgeInsets.only(bottom: 8),
+              itemCount: buttons.length,
+              gridDelegate:
+                  SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 4),
+              itemBuilder: (context, index) {
+                return Buttons(
+                  color: Colors.white,
+                  textColor: Color(0xff000000),
+                  buttonText: buttons[index],
+                  onPressed: () {
+                    setState(
+                      () {
+                        if (buttons[index] == 'C') {
+                          userInput = '';
+                          result = '';
+                        } else if (buttons[index] == 'DEL') {
+                          if (userInput.isNotEmpty) {
+                            userInput =
+                                userInput.substring(0, userInput.length - 1);
                           }
-                        },
-                      );
-                    },
-                  );
-                },
-              ),
+                        } else if (buttons[index] == '\u00b1') {
+                          if (userInput.isNotEmpty) {
+                            userInput = '-' + userInput;
+                          } else {
+                            userInput = '-';
+                          }
+                        } else if (buttons[index] == '\u00f7') {
+                          userInput += '\u00f7';
+                        } else if (buttons[index] == '\u00d7') {
+                          userInput += '\u00d7';
+                        } else if (buttons[index] == '-') {
+                          userInput += '-';
+                        } else if (buttons[index] == '+') {
+                          userInput += '+';
+                        } else if (buttons[index] == '%') {
+                          userInput += '%';
+                        } else if (buttons[index] == '=') {
+                          calculate();
+                        } else {
+                          userInput += buttons[index];
+                        }
+                      },
+                    );
+                  },
+                );
+              },
             ),
           ),
         )
@@ -134,8 +146,20 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  String calculate(String userInput) {
-    result = userInput;
-    return result;
+  void calculate() {
+    String finalInput = userInput;
+    finalInput = finalInput
+        .replaceAll('\u00d7', '*')
+        .replaceAll('\u00f7', '/')
+        .replaceAll('%', '*0.01');
+    Parser p = Parser();
+    Expression exp = p.parse(finalInput);
+    ContextModel cm = ContextModel();
+    double eval = exp.evaluate(EvaluationType.REAL, cm);
+    result = removeDecimalZeroFormat(eval);
+  }
+
+  String removeDecimalZeroFormat(double n) {
+    return n.toStringAsFixed(n.truncateToDouble() == n ? 0 : 2);
   }
 }
